@@ -54,6 +54,19 @@ public class UserService {
      * @param createUserRequest
      */
     public void createUser(CreateUserRequest createUserRequest, MultipartFile multipartFile){
+
+        Optional<User> findUser = userRepository.findByUserId(createUserRequest.getUserId());
+        log.info("user is present?={}",findUser.isPresent());
+        if(findUser.isPresent()){
+            throw new RuntimeException("이미 존재하는 회원입니다.");
+        }
+
+        //아이디 중복 확인
+        isIdDuplication(createUserRequest.getUserId());
+        if(!createUserRequest.getPassword().equals(createUserRequest.getPasswordCheck())){
+            throw new RuntimeException("비밀번호와 비밀번호 확인 문구가 일치하지 않습니다.");
+        }
+
         String storeFilename="default.jpg";  //상수로
         if(multipartFile!=null){
             storeFilename = fileUploadService.storeFile(multipartFile);
@@ -125,6 +138,8 @@ public class UserService {
         return userRepository.findByUserId(userId)
                 .orElseThrow(()->new NoSuchElementException("유저를 찾을 수 없습니다."));
     }
+
+
 
     public User findById(Long id){
         User findUser = userRepository.findById(id);

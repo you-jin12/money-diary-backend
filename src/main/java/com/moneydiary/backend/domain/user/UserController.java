@@ -36,9 +36,6 @@ public class UserController {
     public ResponseEntity signUp(@Valid @RequestPart(value="user") CreateUserRequest createUserRequest,
                                  @RequestPart(value="userProfile",required = false) MultipartFile file){
 
-        if(!createUserRequest.getPassword().equals(createUserRequest.getPasswordCheck())){
-            //비밀번호 , 비밀번호 확인 불일치 예외
-        }
         userService.createUser(createUserRequest,file);
 
         return ResponseEntity
