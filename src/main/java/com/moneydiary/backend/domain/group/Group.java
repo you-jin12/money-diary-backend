@@ -86,6 +86,10 @@ public class Group {
         this.updateDate=updateDate;
     }
 
+    public void changeGroupHost(User groupHost){
+        this.groupHost=groupHost;
+    }
+
     public void subCurrentMember(){
         this.currentMember--;
     }
@@ -93,4 +97,5 @@ public class Group {
     public void addCurrentMember(){
         this.currentMember++;
     }
+
 }

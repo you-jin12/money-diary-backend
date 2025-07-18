@@ -40,4 +40,8 @@ public class UserGroup {
         this.joinDate = joinDate;
         user.getUserGroupList().add(this);
     }
+
+    public void updateRole(Role role){
+        this.role=role;
+    }
 }

@@ -1,5 +1,6 @@
 package com.moneydiary.backend.domain.group.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -16,6 +17,7 @@ public class UpdateGroupRequest {
     private String groupName;
     @Length(min=0,max = 140)
     private String groupMemo;
+    private Long newGroupHost;
     private Long groupHost;
     @Min(1)
     @Max(20)
@@ -23,10 +25,9 @@ public class UpdateGroupRequest {
     @Min(1)
     @Max(20)
     private int currentMember;
+    @JsonProperty("isPrivate")
     private boolean isPrivate;
     @Pattern(regexp = "^$|^[A-Za-z0-9]{4,8}$")
     private String groupPassword;
-    @NotEmpty
-    private Long userId;
 
 }

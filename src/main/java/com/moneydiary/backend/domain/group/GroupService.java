@@ -93,39 +93,6 @@ public class GroupService {
         }
     }
 
-    /**
-     * 그룹 멤버 초대(방장 권한, 비공개방이어도 비번 필요 없음)
-     * @param groupId
-     * @param userId
-     */
-/*    public void addNewMember(Long groupId,Long userId,Long hostSessionId,Long hostId){
-        //올바른 요청인지 확인
-        //요청을 보낸 유저가 호스트인지 확인
-        Group findGroup = this.findById(groupId);
-        if(findGroup.getGroupHost().getId()!=validUser(hostSessionId, hostId)){
-            throw new RuntimeException("그룹 멤버 초대는 그룹의 방장만 가능합니다.");
-        }
-        //초대하려는 유저와 초대 하는 그룹이 존재하는지 확인
-        User findUser = userService.findById(userId);
-        //초대하려는 유저가 이미 3개의 그룹에 가입되어 있는지 검사
-        if(findUser.getUserGroupList().size()>=3){
-            throw new RuntimeException("유저가 이미 3개 이상의 그룹에 가입되어 있습니다.");
-        }
-        //초대하는 그룹의 최대 멤버 수 검사
-        if(findGroup.getCurrentMember()>= findGroup.getMaxMember()){
-            throw new RuntimeException("그룹 인원 수가 초과되어 초대할 수 없습니다.");
-        }
-        //자기 자신을 초대하는지 이미 초대 했거나 그룹에 있는 멤버인지 등등 검사 필요?
-        //유저의 그룹방 가입 정책이 수락 후 가입이면
-        if(findUser.getJoinPolicy()== JoinPolicy.ACCEPT_INVITE){
-            inviteService.createInvite(findGroup,findUser,userService.findById(hostSessionId));
-        }else{
-            UserGroup userGroup = new UserGroup(findUser, findGroup, Role.MEMBER, LocalDate.now());
-            userGroupRepository.save(userGroup);
-            findGroup.addCurrentMember();
-        }
-    }*/
-
     public Group findById(Long id){
         Group findGroup = groupRepository.findById(id);
         if(findGroup==null){
@@ -140,6 +107,8 @@ public class GroupService {
         if(findGroup.getGroupHost().getId()!=hostId){
             throw new RuntimeException("그룹 수정은 방장만 가능합니다.");
         }
+        log.info("updateGroupRequest.isPrivate={}",updateGroupRequest.isPrivate());
+        log.info("groupPassword={}",updateGroupRequest.getGroupPassword());
         if(updateGroupRequest.isPrivate()){//비공개방
             if(findGroup.isPrivate()) {//원래 비공개방
                 if(updateGroupRequest.getGroupPassword()!=null) findGroup.updateGroupPassword(updateGroupRequest.getGroupPassword());
@@ -156,12 +125,25 @@ public class GroupService {
             throw new RuntimeException("그룹의 최대 멤버가 현재 멤버보다 작도록 수정할 수 없습니다.");
         }
         findGroup.updateMaxMember(updateGroupRequest.getMaxMember());
-        if(!multipartFile.isEmpty()){
+        if(multipartFile!= null){
             String storeFileName = fileUploadService.storeFile(multipartFile);
             findGroup.updateGroupImg(storeFileName);
         }
         if(!updateGroupRequest.getGroupName().equals(findGroup.getGroupName())) findGroup.updateGroupName(updateGroupRequest.getGroupName());
         if(!updateGroupRequest.getGroupMemo().equals(findGroup.getGroupMemo())) findGroup.updateGroupMemo(updateGroupRequest.getGroupMemo());
+        //방장양도 로직
+        if(!updateGroupRequest.getNewGroupHost().equals(hostId)){
+            //원래 호스트의 Role을 Member로 변경
+            UserGroup hostUserGroup = userGroupRepository.findByUserIdAndGroupId(hostId, groupId);
+            hostUserGroup.updateRole(Role.MEMBER);
+
+            User findNewHost = userService.findById(updateGroupRequest.getNewGroupHost());
+            findGroup.changeGroupHost(findNewHost);
+            //새호스트의 Role을 Host로 변경
+            UserGroup newHostUserGroup = userGroupRepository.findByUserIdAndGroupId(findNewHost.getId(), groupId);
+            newHostUserGroup.updateRole(Role.HOST);
+        }
+        findGroup.updateUpdateDate(LocalDate.now());
     }
 
     /**

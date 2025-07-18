@@ -81,7 +81,7 @@ public class GroupController {
     public ResponseEntity updateGroup(@SessionAttribute("user")UserSessionDTO session,
                                       @PathVariable Long groupId,
                                       @Valid @RequestPart UpdateGroupRequest updateGroupRequest,
-                                      @RequestPart MultipartFile multipartFile){
+                                      @RequestPart(value = "groupImg",required = false) MultipartFile multipartFile){
 
         groupService.updateGroup(session.getId(),groupId,updateGroupRequest,multipartFile);
         return ResponseEntity.status(HttpStatus.OK)
