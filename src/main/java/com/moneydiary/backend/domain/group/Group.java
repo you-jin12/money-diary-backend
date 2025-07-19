@@ -2,6 +2,7 @@ package com.moneydiary.backend.domain.group;
 
 
 import com.moneydiary.backend.domain.user.User;
+import com.moneydiary.backend.domain.userInvite.Invite;
 import com.moneydiary.backend.domain.usergroup.UserGroup;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +41,9 @@ public class Group {
 
     @OneToMany(mappedBy ="group")
     private List<UserGroup> userGroupList=new ArrayList<>();
+
+    @OneToMany(mappedBy = "group")
+    private List<Invite> inviteList=new ArrayList<>();
 
     public Group(){}
 

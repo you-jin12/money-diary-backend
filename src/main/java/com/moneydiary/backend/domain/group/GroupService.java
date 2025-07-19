@@ -36,7 +36,7 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
-//    private final InviteService inviteService;
+    private final InviteRepository inviteRepository;
     private final UserService userService;
     private final FileUploadService fileUploadService;
 
@@ -155,11 +155,15 @@ public class GroupService {
         if(findGroup.getGroupHost().getId()!=sessionUserId){
             throw new RuntimeException("그룹 삭제는 방장만 가능합니다.");
         }
-        groupRepository.delete(findGroup.getId());
         List<UserGroup> userGroupList = userGroupRepository.findByGroupId(findGroup.getId());
         for (UserGroup userGroup : userGroupList) {
             userGroupRepository.delete(userGroup.getId());
         }
+        List<Invite> inviteList = findGroup.getInviteList(); // N+1
+        for (Invite invite : inviteList) {
+            inviteRepository.delete(invite.getId());
+        }
+        groupRepository.delete(findGroup.getId());
     }
 
     public List<Group> getGroupList() {

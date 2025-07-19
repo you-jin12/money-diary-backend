@@ -22,7 +22,7 @@ public class GroupRepository {
     }
 
     public void delete(Long id){
-        em.createQuery("delete from Group g where e.id=:id")
+        em.createQuery("delete from Group g where g.id=:id")
                 .setParameter("id",id)
                 .executeUpdate();
     }

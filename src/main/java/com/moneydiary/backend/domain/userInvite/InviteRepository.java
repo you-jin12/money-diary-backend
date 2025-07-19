@@ -20,6 +20,12 @@ public class InviteRepository {
         return em.find(Invite.class, id);
     }
 
+    public void delete(Long id){
+        em.createQuery("delete from Invite i where i.id=:id")
+                .setParameter("id",id)
+                .executeUpdate();
+    }
+
     public List<Invite> findByUser(Long userId){
         List<Invite> result = em.createQuery("select i from Invite i left join fetch i.user left join fetch i.group where i.user.id=:userId",Invite.class)
                 .setParameter("userId", userId)
