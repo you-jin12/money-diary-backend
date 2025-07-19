@@ -94,6 +94,12 @@ public class InviteService {
         }
     }
 
+
+    /**
+     * 초대 수락 or 거부 로직
+     * @param inviteId
+     * @param updateInviteStatusRequest
+     */
     public void updateInviteStatus(Long inviteId,UpdateInviteStatusRequest updateInviteStatusRequest) {
         Invite findInvite = findById(inviteId);
         List<UserGroup> userGroupList = userGroupRepository.existUserGroupByUserIdAndGroupId(findInvite.getUser().getId(), findInvite.getGroup().getId());
@@ -102,9 +108,14 @@ public class InviteService {
         }
         //수락이면 => 상태 변경 후 userGroup에 추가
         if(updateInviteStatusRequest.getInvitationStatus()==InvitationStatus.ACCEPTED){
+            Group findGroup = findInvite.getGroup();
+            //그룹의 최대멤버를 초과하지 않는지 확인
+            if(findGroup.getCurrentMember()>=findGroup.getMaxMember()){
+                throw new RuntimeException("그룹이 정원을 초과하여 초대를 수락할 수 없습니다.");
+            }
             findInvite.updateInvitationStatus(InvitationStatus.ACCEPTED);
-            //이미 그룹에 존재하는 유저인지 확인(중복 요청 방지용)
             userGroupRepository.save(new UserGroup(findInvite.getUser(),findInvite.getGroup(),Role.MEMBER, LocalDate.now()));
+            findGroup.addCurrentMember();
         } else if (updateInviteStatusRequest.getInvitationStatus()==InvitationStatus.REJECTED) {
             // 거절이면 => 상태 변경
             findInvite.updateInvitationStatus(InvitationStatus.REJECTED);
@@ -119,6 +130,12 @@ public class InviteService {
         return findInvite;
     }
 
+    /**
+     * 그룹에서 초대한 유저 목록 (아직 초대를 수락하거나 거부 하지 않은 유저만)
+     * @param userId
+     * @param groupId
+     * @return
+     */
     public List<GroupInviteResponse> getInvitesByGroupId(Long userId, Long groupId) {
         User findUser = userService.findById(userId);
         UserGroup findUserGroup = userGroupRepository.findByUserIdAndGroupId(findUser.getId(), groupId);
@@ -129,7 +146,9 @@ public class InviteService {
         ArrayList<GroupInviteResponse> groupInviteResponses = new ArrayList<>();
         for (Invite invite : inviteList) {
             User inviteUser = invite.getUser();
-            groupInviteResponses.add(new GroupInviteResponse(invite.getId(),inviteUser.getId(),inviteUser.getNickName(),inviteUser.getProfileImg(),invite.getInviteDate()));
+            if(invite.getInvitationStatus()== InvitationStatus.PENDING){
+                groupInviteResponses.add(new GroupInviteResponse(invite.getId(),inviteUser.getId(),inviteUser.getNickName(),inviteUser.getProfileImg(),invite.getInviteDate()));
+            }
         }
         return groupInviteResponses;
     }
