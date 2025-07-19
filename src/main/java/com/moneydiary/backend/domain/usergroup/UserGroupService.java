@@ -85,6 +85,9 @@ public class UserGroupService {
                 .filter(userGroup -> userGroup.getGroup().getId() == groupId)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("해당 유저가 가입된 그룹이 아닙니다."));
+        if(findUserGroup.getRole()==Role.HOST){
+            throw new RuntimeException("방장은 그룹을 탈퇴할 수 없습니다.");
+        }
         findUser.getUserGroupList().remove(findUserGroup);
         userGroupRepository.delete(findUserGroup.getId());
         findGroup.subCurrentMember();
