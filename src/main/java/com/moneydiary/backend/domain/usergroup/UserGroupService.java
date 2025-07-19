@@ -166,4 +166,16 @@ public class UserGroupService {
         }
         return groupUserList;
     }
+
+    public void kickMember(Long hostId, Long groupId, Long userId) {
+        //요청을 보낸 유저가 방장인지 검증
+        UserGroup findHostUserGroup = this.findByUserIdAndGroupId(groupId, hostId);
+        if(findHostUserGroup.getRole()!=Role.HOST){
+            throw new RuntimeException("그룹 멤버 강퇴는 그룹의 방장만 가능합니다.");
+        }
+        //그룹이랑 유저 존재여부 검사?
+        UserGroup findUserGroup = this.findByUserIdAndGroupId(groupId, userId);
+        userGroupRepository.delete(findUserGroup.getId());
+        findHostUserGroup.getGroup().subCurrentMember();
+    }
 }

@@ -29,7 +29,7 @@ public class UserGroupRepository {
     }
 
     public List<UserGroup> findByGroupId(Long groupId){ //testX
-        List<UserGroup> userGroupList = em.createQuery("select u from UserGroup u where u.group= :groupId", UserGroup.class)
+        List<UserGroup> userGroupList = em.createQuery("select ug from UserGroup ug where ug.group.id= :groupId", UserGroup.class)
                 .setParameter("groupId", groupId)
                 .getResultList();
         return userGroupList;

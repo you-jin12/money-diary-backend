@@ -69,7 +69,15 @@ public class UserGroupController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse<>(true,userList,"그룹에 속한 유저 리스트를 가져왔습니다."));
     }
-    //초대 수락 로직
-    //초대 거부 로직
-    //방장 양도 로직
+
+    //멤버 강퇴
+    @DeleteMapping("/groups/{groupId}/members/{userId}/kick")
+    public ResponseEntity kickMember(@SessionAttribute("user")UserSessionDTO session,
+                                     @PathVariable("groupId")Long groupId,
+                                     @PathVariable("userId")Long userId){
+        userGroupService.kickMember(session.getId(),groupId,userId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse<>(true,"멤버를 강퇴했습니다."));
+
+    }
 }
