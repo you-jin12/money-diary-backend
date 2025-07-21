@@ -46,12 +46,13 @@ public class ExpenseController {
                 .body(new ApiResponse<>(true,"지출내역이 작성되었습니다."));
     }
 
-    @PutMapping("/{expense_id}")
-    public ResponseEntity updateExpense(@PathVariable(name="expense_id") Long id,
+    @PutMapping("/{expenseId}")
+    public ResponseEntity updateExpense(@SessionAttribute("user")UserSessionDTO session,
+                                        @PathVariable("expenseId") Long id,
                                         @Valid @RequestBody UpdateExpenseRequest request){
         //그룹 채팅에 수정된 지출내역 알림
 
-        expenseService.updateExpense(id,request);
+        expenseService.updateExpense(session.getId(),id,request);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse<>(true,"지출내역이 수정 되었습니다."));

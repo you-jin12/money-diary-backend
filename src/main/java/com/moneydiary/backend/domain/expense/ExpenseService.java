@@ -49,25 +49,21 @@ public class ExpenseService {
         expenseRepository.save(expense);
     }
 
-    private Long validUser(Long sessionUserId, Long userId) {
-        if(sessionUserId==userId){
-            return sessionUserId;
-        }else{
-            throw new RuntimeException("올바르지 않은 요청입니다.");
-        }
-    }
 
     /**
      * 지출 내역 수정 로직
      */
-    public void updateExpense(Long id,UpdateExpenseRequest updateExpenseRequest){
-        Expense findExpense = this.findById(id);
-        if(updateExpenseRequest.getItem()!=null) findExpense.updateItem(updateExpenseRequest.getItem());
+    public void updateExpense(Long userId,Long expenseId,UpdateExpenseRequest updateExpenseRequest){
+        Expense findExpense = this.findById(expenseId);
+        if(findExpense.getUser().getId()!= userId){
+            throw new RuntimeException("올바르지 않은 요청입니다.");
+        }
+        if(!updateExpenseRequest.getItem().equals(findExpense.getItem())) findExpense.updateItem(updateExpenseRequest.getItem());
         if(findExpense.getExpenseMoney() != updateExpenseRequest.getExpenseMoney()) findExpense.updateExpenseMoney(updateExpenseRequest.getExpenseMoney());
         if(findExpense.getIncomeMoney() != updateExpenseRequest.getIncomeMoney()) findExpense.updateIncomeMoney(updateExpenseRequest.getIncomeMoney());
-        if(updateExpenseRequest.getMemo() != null) findExpense.updateMemo(updateExpenseRequest.getMemo());
+        if(!updateExpenseRequest.getMemo().equals(findExpense.getMemo())) findExpense.updateMemo(updateExpenseRequest.getMemo());
         if(findExpense.getExpenseDate() != updateExpenseRequest.getExpenseDate()) findExpense.updateExpenseDate(updateExpenseRequest.getExpenseDate());
-        findExpense.updateExpenseDate(LocalDate.now());
+        findExpense.changeUpdateDate(LocalDateTime.now());
     }
 
     /**

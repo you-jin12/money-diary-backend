@@ -3,6 +3,7 @@ package com.moneydiary.backend.domain.expense;
 import com.moneydiary.backend.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
+import net.bytebuddy.asm.Advice;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -69,4 +70,6 @@ public class Expense {
     public void updateExpenseDate(LocalDate expenseDate) {
         this.expenseDate = expenseDate;
     }
+
+    public void changeUpdateDate(LocalDateTime updateDate){this.updateDate=updateDate;}
 }
