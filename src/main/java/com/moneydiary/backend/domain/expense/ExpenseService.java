@@ -1,5 +1,6 @@
 package com.moneydiary.backend.domain.expense;
 
+import com.moneydiary.backend.common.Validation;
 import com.moneydiary.backend.domain.expense.dto.CreateExpenseRequest;
 import com.moneydiary.backend.domain.expense.dto.UpdateExpenseRequest;
 import com.moneydiary.backend.domain.user.User;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -67,13 +69,22 @@ public class ExpenseService {
     }
 
     /**
-     * 지출 내역 삭제 로직
+     * 지출 내역 다건 삭제
      * @param ids
      */
     public void deleteExpense(List<Long> ids){
         for (Long id : ids) {
             expenseRepository.deleteExpense(id);
         }
+    }
+
+    /**
+     * 지출 내역 단건 삭제
+     * @param id
+     */
+    public void deleteExpense(Long id){
+        Expense findExpense = findById(id);
+        expenseRepository.deleteExpense(id);
     }
 
 

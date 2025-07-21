@@ -58,9 +58,8 @@ public class ExpenseController {
                 .body(new ApiResponse<>(true,"지출내역이 수정 되었습니다."));
     }
 
-    @PostMapping("/{expense_id}")
+    @PostMapping("/delete")
     public ResponseEntity deleteExpense(@SessionAttribute("user")UserSessionDTO session,
-                                        @PathVariable(name="expense_id") Long id,
                                         @RequestBody List<Long> ids){
         expenseService.deleteExpense(ids);
 
