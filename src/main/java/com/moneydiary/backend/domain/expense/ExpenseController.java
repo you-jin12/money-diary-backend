@@ -81,13 +81,8 @@ public class ExpenseController {
     public ResponseEntity getExpenseByDate(@PathVariable(name="userId")Long userId,
                                            @SessionAttribute("user")UserSessionDTO session,
                                            @PathVariable(name="expenseDate") @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate expenseDate){
-        List<Expense> expenseByDate = expenseService.getExpenseByDate(userId, session.getId(),expenseDate);
-        List list=new ArrayList();
-        for (Expense expense : expenseByDate) {
-            ExpenseByDateResponse expenseByDateResponse = new ExpenseByDateResponse(expense.getId(), expense.getItem(), expense.getExpenseMoney(), expense.getIncomeMoney(), expense.getMemo(), expense.getExpenseDate());
-            list.add(expenseByDateResponse);
-        }
+        List<ExpenseByDateResponse> expenseByDate = expenseService.getExpenseByDate(userId, session.getId(),expenseDate);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<List<ExpenseByDateResponse>>(true,list,"해당 일자의 지출 내역 리스트를 가져 왔습니다."));
+                .body(new ApiResponse<List<ExpenseByDateResponse>>(true,expenseByDate,"해당 일자의 지출 내역 리스트를 가져 왔습니다."));
     }
 }

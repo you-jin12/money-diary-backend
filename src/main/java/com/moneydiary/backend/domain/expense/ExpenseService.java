@@ -126,10 +126,15 @@ public class ExpenseService {
      * @param expenseDate
      * @return
      */
-    public List<Expense> getExpenseByDate(Long userId,Long sessionUserId, LocalDate expenseDate) {
-        User findUser = userService.findById(validUser(sessionUserId, userId));
+    public List<ExpenseByDateResponse> getExpenseByDate(Long userId,Long sessionUserId, LocalDate expenseDate) {
+        User findUser = userService.findById(validation.validUser(sessionUserId, userId));
         log.info("expenseDate.toString()={}",expenseDate.toString());
-        List expenseByDate = expenseRepository.getExpenseByDate(findUser.getId(),expenseDate);
-        return expenseByDate;
+        List<Expense> expenseByDate = expenseRepository.getExpenseByDate(findUser.getId(),expenseDate);
+        List<ExpenseByDateResponse> list=new ArrayList();
+        for (Expense expense : expenseByDate) {
+            ExpenseByDateResponse expenseByDateResponse = new ExpenseByDateResponse(expense.getId(), expense.getItem(), expense.getExpenseMoney(), expense.getIncomeMoney(), expense.getMemo(), expense.getExpenseDate());
+            list.add(expenseByDateResponse);
+        }
+        return list;
     }
 }
