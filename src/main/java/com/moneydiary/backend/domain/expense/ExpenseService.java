@@ -2,6 +2,8 @@ package com.moneydiary.backend.domain.expense;
 
 import com.moneydiary.backend.common.Validation;
 import com.moneydiary.backend.domain.expense.dto.CreateExpenseRequest;
+import com.moneydiary.backend.domain.expense.dto.DateExpense;
+import com.moneydiary.backend.domain.expense.dto.ExpenseByDateResponse;
 import com.moneydiary.backend.domain.expense.dto.UpdateExpenseRequest;
 import com.moneydiary.backend.domain.user.User;
 import com.moneydiary.backend.domain.user.UserService;
@@ -94,11 +96,12 @@ public class ExpenseService {
      * @param expenseDate
      * @return
      */
-    public List getTotalDateExpense(Long userId,Long sessionUserId,LocalDate expenseDate){
-        User user = userService.findById(validUser(sessionUserId, userId));
+    public List<DateExpense> getTotalDateExpense(Long userId,Long sessionUserId,LocalDate expenseDate){
+        User user = userService.findById(validation.validUser(sessionUserId, userId));
         int month = getMonth(expenseDate);
         int year = getYear(expenseDate);
-        return expenseRepository.getTotalDateExpense(user.getId(),month,year);
+        List<DateExpense> totalDateExpense = expenseRepository.getTotalDateExpense(user.getId(), month, year);
+        return totalDateExpense;
     }
 
     private int getMonth(LocalDate date){

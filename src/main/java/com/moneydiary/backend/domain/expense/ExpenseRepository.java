@@ -46,9 +46,9 @@ public class ExpenseRepository {
 
     public List getTotalDateExpense(Long userId, int month, int year) {
         String query="select new com.moneydiary.backend.domain.expense.dto.DateExpense(day(e.expenseDate) ,sum(e.expenseMoney)) " +
-                    "from Expense e join e.user u " +
-                    "where u.id=:userId and Year(e.expenseDate)=:year and Month(e.expenseDate)=:month " +
-                    "group by e.expenseDate";
+                    "from Expense e " +
+                    "where e.user.id=:userId and Year(e.expenseDate)=:year and Month(e.expenseDate)=:month " +
+                    "group by day(e.expenseDate)";
         List<DateExpense> resultList = em.createQuery(query,DateExpense.class)
                 .setParameter("userId", userId)
                 .setParameter("year", year)
