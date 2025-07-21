@@ -58,8 +58,8 @@ public class ExpenseRepository {
         return resultList;
     }
 
-    public List getExpenseByDate(Long userId, LocalDate expenseDate){
-        String query="select e from Expense e join e.user u where u.id=:userId and e.expenseDate=:expenseDate";
+    public List<Expense> getExpenseByDate(Long userId, LocalDate expenseDate){
+        String query="select e from Expense e where e.user.id=:userId and e.expenseDate=:expenseDate";
         List<Expense> resultList = em.createQuery(query, Expense.class)
                 .setParameter("userId", userId)
                 .setParameter("expenseDate", expenseDate)
