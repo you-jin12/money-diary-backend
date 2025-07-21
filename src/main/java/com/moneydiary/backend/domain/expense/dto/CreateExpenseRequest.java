@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -17,7 +19,9 @@ public class CreateExpenseRequest {
     @NotEmpty
     @Length(min = 1,max = 140)
     private String item;
+    @Min(value = 0)
     private int expenseMoney;
+    @Min(value = 0)
     private int incomeMoney;
     @Length(min = 0,max = 140)
     private String memo;

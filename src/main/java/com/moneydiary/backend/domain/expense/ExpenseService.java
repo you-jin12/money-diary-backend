@@ -24,11 +24,17 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final UserService userService;
 
+    private final Validation validation;
+
     /**
      * 지출 내역 작성 로직
      */
     public void createExpense(Long sessionUserId,CreateExpenseRequest createExpenseRequest){
-        Long userId = validUser(sessionUserId, createExpenseRequest.getUserId());
+        Long userId = validation.validUser(sessionUserId, createExpenseRequest.getUserId());
+        if(createExpenseRequest.getExpenseMoney()>0 && createExpenseRequest.getIncomeMoney()>0){
+            throw new RuntimeException("지출과 수입은 동시에 입력할 수 없습니다.");
+        }
+        log.info("expenseMoney={}",createExpenseRequest.getExpenseMoney());
         User findUser = userService.findById(userId);
         Expense expense = Expense.builder()
                 .item(createExpenseRequest.getItem())
