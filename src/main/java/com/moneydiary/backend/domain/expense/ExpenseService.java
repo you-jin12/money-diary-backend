@@ -1,6 +1,7 @@
 package com.moneydiary.backend.domain.expense;
 
 import com.moneydiary.backend.common.Validation;
+import com.moneydiary.backend.domain.chat.ExpenseChatService;
 import com.moneydiary.backend.domain.expense.dto.CreateExpenseRequest;
 import com.moneydiary.backend.domain.expense.dto.DateExpense;
 import com.moneydiary.backend.domain.expense.dto.ExpenseByDateResponse;
@@ -27,6 +28,7 @@ public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final UserService userService;
+    private final ExpenseChatService expenseChatService;
 
     private final Validation validation;
 
@@ -51,6 +53,8 @@ public class ExpenseService {
                 .build();
 
         expenseRepository.save(expense);
+        //지출내역채팅 생성 로직 호출
+        expenseChatService.createExpenseChat(expense);
     }
 
 

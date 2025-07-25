@@ -31,6 +31,9 @@ public class ExpenseChatService {
             Group findGroup = userGroup.getGroup();
             ExpenseChatMessage expenseChatMessage = new ExpenseChatMessage(expense, userGroup, now, null);
             expenseChatRepository.save(expenseChatMessage);
+            //소켓에 연결 되어 있는 채팅방에 지출내역 메시지 전송
+            ExpenseChatMessageResponse expenseChatMessageResponse = new ExpenseChatMessageResponse(expenseChatMessage.getId(), findUser.getId(), findUser.getNickName(), findUser.getProfileImg(), findGroup.getId(), expense.getItem(), expense.getExpenseMoney(), expense.getMemo(), expense.getExpenseDate(), expenseChatMessage.getPostDate());
+            messagingTemplate.convertAndSend("/room/messages/"+userGroup.getGroup().getId(),expenseChatMessageResponse);
         }
     }
 
