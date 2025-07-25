@@ -13,6 +13,7 @@ public class ChatMessage {
 
     @Id
     @GeneratedValue(strategy =GenerationType.AUTO)
+    @Column(name = "chat_message_id")
     private Long id;
     @Lob
     private String content;
