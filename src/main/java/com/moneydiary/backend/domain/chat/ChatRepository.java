@@ -33,9 +33,9 @@ public class ChatRepository {
         return chatMessage;
     }
 
-    public List getChatList(Long id){
-        List<ChatMessage> chatList = em.createQuery("select c from ChatMessage c join c.userGroup ug join ug.group g where g.id=:id order by c.postDate asc", ChatMessage.class)
-                .setParameter("id", id)
+    public List getChatList(Long groupId){
+        List<ChatMessage> chatList = em.createQuery("select c from ChatMessage c join c.userGroup ug where ug.group.id=:id order by c.postDate asc", ChatMessage.class)
+                .setParameter("id", groupId)
                 .getResultList();
         return chatList;
     }

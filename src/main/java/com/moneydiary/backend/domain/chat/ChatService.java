@@ -1,7 +1,10 @@
 package com.moneydiary.backend.domain.chat;
 
+import com.moneydiary.backend.domain.chat.dto.ChatMessageResponse;
 import com.moneydiary.backend.domain.chat.dto.ChatRequest;
 import com.moneydiary.backend.domain.chat.dto.ChatResponse;
+import com.moneydiary.backend.domain.chat.dto.ExpenseChatMessageResponse;
+import com.moneydiary.backend.domain.expense.Expense;
 import com.moneydiary.backend.domain.group.Group;
 import com.moneydiary.backend.domain.user.User;
 import com.moneydiary.backend.domain.usergroup.UserGroup;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -24,6 +28,8 @@ public class ChatService {
     private final UserGroupService userGroupService;
     private final ChatRepository chatRepository;
 
+    private final ExpenseChatRepository expenseChatRepository;
+
 
     public Long createChat(ChatRequest chatRequest){
         log.info("userId={}, groupId={}",chatRequest.getUserId(),chatRequest.getGroupId());
@@ -32,15 +38,6 @@ public class ChatService {
         Long chatId = chatRepository.save(chatMessage);
         return chatId;
     }
-
-    private Long validUser(Long sessionUserId, Long userId) {
-        if(sessionUserId==userId){
-            return sessionUserId;
-        }else{
-            throw new RuntimeException("올바르지 않은 요청입니다.");
-        }
-    }
-
 
     public ChatMessage findById(Long id){
         ChatMessage findChat = chatRepository.findById(id);
@@ -55,21 +52,37 @@ public class ChatService {
         return findChat;
     }
 
+
+    /**
+     * 채팅 리스트(ChatMessage * ExpenseChatMessage)
+     * @param groupId
+     * @param userId
+     * @return
+     */
     public List<ChatResponse> getChatList(Long groupId,Long userId){
 
         //validation(유저가 그룹에 소속되어 있는지 확인)
         UserGroup findUserGroup = userGroupService.findByUserIdAndGroupId(groupId,userId);
         Group group = findUserGroup.getGroup();
-        log.info("findUserGroup.getGroup().getId()={}",findUserGroup.getGroup());
-        log.info("group Id={}",group.getId());
 
         List<ChatMessage> chatList = chatRepository.getChatList(groupId);
+        List<ExpenseChatMessage> expenseChatList = expenseChatRepository.getExpenseChatList(groupId);
 
         List<ChatResponse> list=new ArrayList<>();
+
         for (ChatMessage chatMessage : chatList) {
             User user = chatMessage.getUserGroup().getUser();
-            list.add(new ChatResponse(user.getId(),user.getNickName(),user.getProfileImg(),groupId,chatMessage.getContent(),chatMessage.getPostDate()));
+            list.add(new ChatMessageResponse(chatMessage.getId(),user.getId(),user.getNickName(),user.getProfileImg(),groupId,chatMessage.getContent(),chatMessage.getPostDate()));
         }
+        for (ExpenseChatMessage expenseChatMessage : expenseChatList) {
+            User user = expenseChatMessage.getUserGroup().getUser();
+            Expense expense = expenseChatMessage.getExpense();
+            list.add(new ExpenseChatMessageResponse(expenseChatMessage.getId(),user.getId(),user.getNickName(),user.getProfileImg(),groupId,expense.getItem(),expense.getExpenseMoney(),expense.getMemo(),expense.getExpenseDate(),expenseChatMessage.getPostDate()));
+        }
+
+        //postDate로 오름차순 정렬
+        list.sort((e1,e2)-> e1.getPostDate().compareTo(e2.getPostDate()));
         return list;
     }
+
 }

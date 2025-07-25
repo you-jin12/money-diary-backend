@@ -1,6 +1,7 @@
 package com.moneydiary.backend.domain.chat;
 
 
+import com.moneydiary.backend.domain.chat.dto.ChatMessageResponse;
 import com.moneydiary.backend.domain.chat.dto.ChatRequest;
 import com.moneydiary.backend.domain.chat.dto.ChatResponse;
 import com.moneydiary.backend.domain.user.User;
@@ -41,7 +42,7 @@ public class ChatController {
         Long chatId = chatService.createChat(chatRequest);
         ChatMessage chat = chatService.findByIdwithFetchJoin(chatId);
         User chatUser = chat.getUserGroup().getUser();
-        return new ChatResponse(chatUser.getId(),chatUser.getNickName(),chatUser.getProfileImg(),chat.getUserGroup().getGroup().getId(),chat.getContent(),chat.getPostDate());
+        return new ChatMessageResponse(chat.getId(),chatUser.getId(),chatUser.getNickName(),chatUser.getProfileImg(),chat.getUserGroup().getGroup().getId(),chat.getContent(),chat.getPostDate());
 
     }
 
@@ -51,7 +52,7 @@ public class ChatController {
         //해당 유저가 채팅방에 속한 유저인지 확인
         List<ChatResponse> chatList = chatService.getChatList(groupId, session.getId());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<>(true,chatList,"해당 그룹의 채팅 내역을 가져왔습니다."));
+                .body(new ApiResponse<List<ChatResponse>>(true,chatList,"해당 그룹의 채팅 내역을 가져왔습니다."));
     }
 
 }
